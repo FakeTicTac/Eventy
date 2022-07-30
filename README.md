@@ -1,4 +1,4 @@
-# icd0021-21-22-s
+# Eventy - The Application For Searching And Creating Events.
 
 **Name:** Roman Makejev  
 **Uni-ID:** romake  
