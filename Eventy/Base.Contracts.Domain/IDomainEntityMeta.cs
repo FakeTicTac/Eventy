@@ -3,29 +3,29 @@ namespace Base.Contracts.Domain;
 
 
 /// <summary>
-/// Basic Database Meta-Data Entity Design: Defines Common Rows in Database Table.
+/// Basic Database Entity Meta-Data Design:
+/// - Defines Common Meta Rows Such As Created At, Created By and etc. 
 /// </summary>
-// ReSharper disable UnusedMemberInSuper.Global
 public interface IDomainEntityMeta
 {
     
     /// <summary>
-    /// Defines Data Insertion Time. 
+    /// Defines Data Related to Entity Insertion Time. 
     /// </summary>
     string? CreatedBy { get; set; }
     
     /// <summary>
-    /// Defines User/System Who Inserted The Data.
+    /// Defines Data Related to User/System Who Proceed Insertion. 
     /// </summary>
     DateTime? CreatedAt { get; set; }
     
     /// <summary>
-    /// Defines Data Update Time. 
+    /// Defines Data Related to Entity Update Time. 
     /// </summary>
     string? ModifiedBy { get; set; }
     
     /// <summary>
-    /// Defines User/System Who Updated The Data.
+    /// Defines Data Related to User/System Who Proceed Update. 
     /// </summary>
     DateTime? ModifiedAt { get; set; }
     

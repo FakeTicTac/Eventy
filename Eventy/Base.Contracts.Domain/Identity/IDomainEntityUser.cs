@@ -3,31 +3,32 @@ namespace Base.Contracts.Domain.Identity;
 
 
 /// <summary>
-/// Basic Database User Identity Related Entity Design: Uses Guid Value as Foreign Key Type.
+/// Basic Database Related To User Entity Design With Predefined Foreign Key Type as Guid:
+/// - Defines Common Rows Such As User ID. 
 /// </summary>
-/// <typeparam name="TAppUser">Entity User Identity Object Definition.</typeparam>
-// ReSharper disable UnusedMemberInSuper.Global
+/// <typeparam name="TAppUser">Entity User Related Foreign Key Type Definition.</typeparam>
 public interface IDomainEntityUser<TAppUser> : IDomainEntityUser<Guid, TAppUser>
     where TAppUser: class { }
 
 
 /// <summary>
-/// Basic Database User Identity Related Entity Design: Defines Common Rows in Database Table.
+/// Basic Database Related To User Entity Design:
+/// - Defines Common Rows Such As User ID. 
 /// </summary>
-/// <typeparam name="TKey">Entity Primary Key Definition.</typeparam>
-/// <typeparam name="TAppUser">Entity User Identity Object Definition.</typeparam>
+/// <typeparam name="TKey">Entity Primary Key Type Definition.</typeparam>
+/// <typeparam name="TAppUser">Entity User Related Foreign Key Type Definition.</typeparam>
 public interface IDomainEntityUser<TKey, TAppUser>
     where TKey: IEquatable<TKey>
     where TAppUser: class
 {
     
     /// <summary>
-    /// Entity Foreign Key To Identity System Definition.
+    /// Defines Entity User Foreign Key Related To User.
     /// </summary>
     TKey AppUserId { get; set; }
     
     /// <summary>
-    /// Entity Connection Object To Identity System Definition.
+    /// Defines Entity User Object Related To User.
     /// </summary>
     TAppUser? AppUser { get; set; }
     
