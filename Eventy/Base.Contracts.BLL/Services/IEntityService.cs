@@ -16,7 +16,7 @@ public interface IEntityService<TBllEntity, TDalEntity> : IEntityService<TBllEnt
 
 
 /// <summary>
-/// Business Logic Layer Service Basic Design With Predefined Primary Key Type as Guid:
+/// Business Logic Layer Service Basic Design:
 /// </summary>
 /// <typeparam name="TBllEntity">Defines Type Of Data Transfer Object To Be Processed In Business Logic Layer.</typeparam>
 /// <typeparam name="TDalEntity">Defines Type Of Data Transfer Object To Be Processed In Data Access Layer.</typeparam>
