@@ -6,4 +6,19 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <EmbeddedResource Update="Base.Domain\Domain.resx">
+        <Generator>PublicResXFileCodeGenerator</Generator>
+        <LastGenOutput>Domain.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Base.Domain\Domain.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Domain.resx</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
 </Project>
