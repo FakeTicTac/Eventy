@@ -1,6 +1,4 @@
 ﻿using Base.Domain;
-using App.Domain.Identity;
-using Base.Contracts.Domain;
 using Base.Domain.Translation;
 
 
@@ -17,7 +15,7 @@ namespace App.DAL.DTO;
 ///  - Defines Specific Entity Rows for Event. 
 /// </summary>
 // ReSharper disable once ClassNeverInstantiated.Global
-public class Event : DomainEntityUser<AppUser>, IDomainEntityId
+public class Event : DomainEntityId
 {
 
     /// <summary>
@@ -48,5 +46,14 @@ public class Event : DomainEntityUser<AppUser>, IDomainEntityId
     /// Defines Event Cover Image Path on Server Side.
     /// </summary>
     public string? CoverImagePath { get; set; }
+    
+    
+    // EF CORE Related Relations Are Going Next -->
+    
+    
+    /// <summary>
+    /// Defines Event Belonging To The User ID.
+    /// </summary>
+    public Guid AppUserId { get; set; }
     
 }

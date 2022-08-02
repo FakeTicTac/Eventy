@@ -1,0 +1,9 @@
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                                    Database Commands
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+dotnet ef database drop --project App.DAL.EF --startup-project WebApp
+
+dotnet ef migrations add InitialCreate --project App.DAL.EF --startup-project WebApp
+
+dotnet ef database update --project App.DAL.EF --startup-project WebApp

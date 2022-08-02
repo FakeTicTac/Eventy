@@ -6,4 +6,21 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Folder Include="Migrations" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.7" />
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.5" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\App.Contracts.DAL\App.Contracts.DAL.csproj" />
+      <ProjectReference Include="..\App.DAL.DTO\App.DAL.DTO.csproj" />
+      <ProjectReference Include="..\App.Domain\App.Domain.csproj" />
+      <ProjectReference Include="..\Base.DAL.EF.Helpers\Base.DAL.EF.Helpers.csproj" />
+      <ProjectReference Include="..\Base.DAL.EF\Base.DAL.EF.csproj" />
+    </ItemGroup>
+
 </Project>
