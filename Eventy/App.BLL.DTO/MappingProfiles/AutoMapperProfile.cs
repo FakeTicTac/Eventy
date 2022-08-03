@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using App.BLL.DTO.Identity;
 
 using DalAppDTO = App.DAL.DTO;
 
@@ -22,14 +21,6 @@ public class AutoMapperProfile : Profile
     {
 
         CreateMap<Event, DalAppDTO.Event>().ReverseMap();
-        
-        
-        // Identity Related Mappings
-        
-        
-        CreateMap<AppUser, DalAppDTO.Identity.AppUser>().ReverseMap();
-        
-        CreateMap<AppRole, DalAppDTO.Identity.AppRole>().ReverseMap();
         
     }
 }
