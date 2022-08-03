@@ -4,7 +4,7 @@ using App.BLL.DTO.Identity;
 using DalAppDTO = App.DAL.DTO;
 
 
-namespace App.BLL.DTO.MappingProfile;
+namespace App.BLL.DTO.MappingProfiles;
 
 
 /// <summary>
