@@ -7,16 +7,16 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 
 // ReSharper disable CollectionNeverUpdated.Global
-// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 
 namespace App.Domain;
 
 
 /// <summary>
-/// Application Event Table Implementation.
-///  - Defines Specific Entity Rows for Event. 
+/// Application Data Access Layer Event Data Transfer Object.
+///  - Data That Should Define Event.
 /// </summary>
 // ReSharper disable once ClassNeverInstantiated.Global
 public class Event : DomainEntityUser<AppUser>, IDomainEntityId

@@ -42,7 +42,8 @@ public class EventRepository : BaseEntityRepository<DalAppDTO.Event, DomainApp.E
     {
         var query = CreateQuery(noTracking);
 
-        return (await query.Where(x => x.Title.ToString().ToUpper().Contains(partialName!.ToUpper())).ToListAsync())
+        return (await query.Where(x => x.Title.ToString().ToUpper().Contains(partialName!.ToUpper()))
+                .ToListAsync())
             .Select(x => Mapper.Map(x))!;
     }
 }

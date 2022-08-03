@@ -26,10 +26,9 @@ public interface IEventRepositoryCustom<TEntity>
     
     
     /// <summary>
-    /// Method Gets All Events By Data Encapsulation.
-    ///  - Method Mainly Used For Search.
+    /// Method Gets All Events With Partial Name Asynchronously.
     /// </summary>
-    /// <param name="partialName">Defines Part Of Event Name To Be Searched For.</param>
+    /// <param name="partialName">Defines Part Of Event Name.</param>
     /// <param name="noTracking">Defines Tracking Options.</param>
     /// <returns>Asynchronous Operation That Returns The Value of Enumerable of Entities.</returns>
     public Task<IEnumerable<TEntity>> GetAllByPartialNameAsync(string? partialName, bool noTracking = true);
