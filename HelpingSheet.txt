@@ -7,3 +7,11 @@ dotnet ef database drop --project App.DAL.EF --startup-project WebApp
 dotnet ef migrations add InitialCreate --project App.DAL.EF --startup-project WebApp
 
 dotnet ef database update --project App.DAL.EF --startup-project WebApp
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                                 Web Api Controllers                                                  
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+dotnet aspnet-codegenerator controller -name EventController -actions -m App.Domain.Event -dc AppDbContext -outDir ApiControllers -api --useAsyncActions  -f

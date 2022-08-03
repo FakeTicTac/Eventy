@@ -4,7 +4,6 @@ using System.Text;
 using WebApp.Helpers;
 using App.Contracts.DAL;
 using App.Contracts.BLL;
-using Base.WebApp.Helpers;
 using App.Domain.Identity;
 using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +12,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using Base.WebApp.Helpers.Translation;
 using Microsoft.AspNetCore.Localization;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -33,7 +31,6 @@ var supportedCultures = builder.Configuration
 
 // Adding Needed Services to Container.
 
-
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(dbConnectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -47,9 +44,9 @@ builder.Services.AddIdentity<AppUser, AppRole>(options => { options.SignIn.Requi
 
 // JWT Support 
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
 builder.Services
     .AddAuthentication()
-    .AddCookie(options => { options.SlidingExpiration = true; })
     .AddJwtBearer(cfg =>
     {
         cfg.RequireHttpsMetadata = false;
@@ -70,7 +67,7 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.Password.RequireDigit = true;
     options.Password.RequiredLength = 8;
     options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireUppercase = true;
+    options.Password.RequireUppercase = false;
     options.Password.RequireLowercase = false;
     options.Password.RequiredUniqueChars = 6;
     
@@ -81,20 +78,6 @@ builder.Services.Configure<IdentityOptions>(options =>
     
     // User Settings Configurations.
     options.User.RequireUniqueEmail = true;
-});
-
-builder.Services.ConfigureApplicationCookie(options =>
-{
-    // Cookie Settings Configuration.
-    options.Cookie.HttpOnly = true;
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
-    
-    // Redirections Settings Configuration.
-    options.LoginPath = "/Account/Login";
-    options.AccessDeniedPath = "/Account/AccessDenied";
-    
-    // Cookie Renew Configurations.
-    options.SlidingExpiration = true;
 });
 
 builder.Services.AddCors(options =>
@@ -136,8 +119,7 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     options.RequestCultureProviders = new List<IRequestCultureProvider>
     {
         // Order Is Important. (Evaluated By Ordering)
-        new QueryStringRequestCultureProvider(),
-        new CookieRequestCultureProvider()
+        new QueryStringRequestCultureProvider()
     };
 });
 
@@ -147,10 +129,9 @@ builder.Services.AddAutoMapper(
     typeof(Api.DTO.v1.MappingProfiles.AutoMapperProfile));
 
 
-
-
 var app = builder.Build();
 
+// Seed Initial Data Into Application.
 AppDataHelper.SetupAppData(app, app.Environment, app.Configuration);
 
 
@@ -187,10 +168,6 @@ app.UseRequestLocalization(options: app.Services.GetService<IOptions<RequestLoca
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.MapControllerRoute(
-    name: "areas",
-    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 
 app.MapControllerRoute(
     name: "default",

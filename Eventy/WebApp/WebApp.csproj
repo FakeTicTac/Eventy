@@ -16,6 +16,7 @@
         <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.7" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.7" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.7">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -27,8 +28,10 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Api.DTO.v1\Api.DTO.v1.csproj" />
       <ProjectReference Include="..\App.BLL\App.BLL.csproj" />
       <ProjectReference Include="..\App.DAL.EF\App.DAL.EF.csproj" />
+      <ProjectReference Include="..\Base.Extensions\Base.Extensions.csproj" />
       <ProjectReference Include="..\Base.WebApp.Helpers\Base.WebApp.Helpers.csproj" />
     </ItemGroup>
 
