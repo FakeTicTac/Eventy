@@ -2,6 +2,8 @@ using AutoMapper;
 using Api.DTO.v1.DTO;
 using App.Contracts.BLL;
 using Api.DTO.v1.Mappers;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -56,106 +58,108 @@ public class EventController : ControllerBase
     [ProducesResponseType(typeof(IEnumerable<Event>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<Event>>> GetEvents() => 
         Ok((await _bll.Events.GetAllAsync()).Select(x => _mapper.Map(x)));
-
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    // GET: api/Event/5
-    [HttpGet("{id}")]
+    /// <summary>
+    /// Method Gets Located In Database Event By ID.
+    /// </summary>
+    /// <param name="id">Event ID Value To Search For Event.</param>
+    /// <returns>Data Transfer Event Object Of Found Record.</returns>
+    [HttpGet("{id:guid}")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(Event), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<Event>> GetEvent(Guid id)
     {
-        if (_context.Events == null)
-        {
-            return NotFound();
-        }
-        var @event = await _context.Events.FindAsync(id);
+        var appEvent = await _bll.Events.FirstOrDefaultAsync(id);
 
-        if (@event == null)
-        {
-            return NotFound();
-        }
-
-        return @event;
+        // Check If Exist In Database.
+        if (appEvent == null) return NotFound();
+        
+        return _mapper.Map(appEvent)!;
     }
     
     
-
-    // PUT: api/Event/5
-    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-    [HttpPut("{id}")]
-    public async Task<IActionResult> PutEvent(Guid id, Event @event)
+    /// <summary>
+    /// Method Updates Record of Event In Database Layer.
+    /// </summary>
+    /// <param name="id">Event ID Value of Event To Be Updated.</param>
+    /// <param name="appEvent">Defines Event Value To Be Updated.</param>
+    /// <returns>
+    /// Status Codes:<br/>
+    /// 204 No Content: Update Action Was Successful.<br/>
+    /// 400 Bad Request: ID In URL And ID in DTO Doesn't Match.<br/>
+    /// </returns>
+    [HttpPut("{id:guid}")]
+    [Consumes("application/json")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> PutEvent(Guid id, Event appEvent)
     {
-        if (id != @event.Id)
-        {
-            return BadRequest();
-        }
-
-        _context.Entry(@event).State = EntityState.Modified;
-
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!EventExists(id))
-            {
-                return NotFound();
-            }
-            else
-            {
-                throw;
-            }
-        }
+        if (!id.Equals(appEvent.Id)) return BadRequest();
+        
+        // Update State In Database.
+        _bll.Events.Update(_mapper.Map(appEvent)!);
+        
+        // TODO! Security!
+        
+        await _bll.SaveChangesAsync();
 
         return NoContent();
     }
 
-    // POST: api/Event
-    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+    
+    /// <summary>
+    /// Method Creates Event Record In Database Layer.
+    /// </summary>
+    /// <param name="appEvent">Object Value To Be Created In Database.</param>
+    /// <returns>Created Event Object.</returns>
     [HttpPost]
-    public async Task<ActionResult<Event>> PostEvent(Event @event)
+    [Produces("application/json")]
+    [Consumes("application/json")]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(Event), StatusCodes.Status200OK)]
+    public async Task<ActionResult<Event>> PostEvent(Event appEvent)
     {
-        if (_context.Events == null)
-        {
-            return Problem("Entity set 'AppDbContext.Events'  is null.");
-        }
-        _context.Events.Add(@event);
-        await _context.SaveChangesAsync();
+        if (HttpContext.GetRequestedApiVersion() == null) return BadRequest("API version is not defined.");
+        
+        // Add Drink To The Database Layer.
+        var bllEvent = _bll.Events.Add(_mapper.Map(appEvent)!);
+        await _bll.SaveChangesAsync();
 
-        return CreatedAtAction("GetEvent", new { id = @event.Id }, @event);
+        return CreatedAtAction("GetEvent", new
+        {
+            id = bllEvent.Id,
+            version = HttpContext.GetRequestedApiVersion()!.ToString()
+        }, bllEvent);
     }
 
-    // DELETE: api/Event/5
-    [HttpDelete("{id}")]
+    /// <summary>
+    /// Method Deletes Event In The Database Layer.
+    /// </summary>
+    /// <param name="id">Event ID Value of Event To Be Deleted.</param>
+    /// <returns>
+    /// Status codes:<br/>
+    /// 204 No Content: Delete Action Was Successful<br/>
+    /// 404 Not Found: Server Fails To Find Event<br/>
+    /// </returns>
+    [HttpDelete("{id:guid}")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteEvent(Guid id)
     {
-        if (_context.Events == null)
-        {
-            return NotFound();
-        }
-        var @event = await _context.Events.FindAsync(id);
-        if (@event == null)
-        {
-            return NotFound();
-        }
-
-        _context.Events.Remove(@event);
-        await _context.SaveChangesAsync();
+        // Try To Get Record From Database.
+        var appEvent = await _bll.Events.FirstOrDefaultAsync(id);
+        if (appEvent == null) return NotFound();
+        
+        // TODO! Security!
+        // Remove Existed Record.
+        _bll.Events.Remove(appEvent);
+        await _bll.SaveChangesAsync();
 
         return NoContent();
-    }
-
-    private bool EventExists(Guid id)
-    {
-        return (_context.Events?.Any(e => e.Id == id)).GetValueOrDefault();
     }
 }
