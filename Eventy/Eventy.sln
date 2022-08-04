@@ -54,6 +54,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 		..\README.md = ..\README.md
 		..\HelpingSheet.txt = ..\HelpingSheet.txt
 		Directory.Build.props = Directory.Build.props
+		docker-compose.yml = docker-compose.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ApiDTO", "ApiDTO", "{60FE008E-4CCE-4BB5-99A8-AAF42FD33F2E}"
