@@ -310,7 +310,7 @@ public class BaseEntityRepository<TDalEntity, TDomainEntity, TUser, TKey, TDbCon
     /// <param name="operation">Operation Declaration To Be Performed on Database Layer.</param>
     /// <param name="userId">Defines Entity Demanding User ID Value.</param>
     /// <returns></returns>
-    protected virtual TDomainEntity SecurityBasicHandler(
+    protected virtual TDomainEntity? SecurityBasicHandler(
         TDomainEntity entity, 
         Func<TDomainEntity> operation, 
         object? userId = null
@@ -328,11 +328,10 @@ public class BaseEntityRepository<TDalEntity, TDomainEntity, TUser, TKey, TDbCon
         var queryResult = RepoDbSet.AsQueryable()
             .Any(x => Microsoft.EntityFrameworkCore.EF.Property<TKey>(x, nameof(IDomainEntityUser<TUser>.AppUserId))
                 .Equals((TKey) userId) && x.Id.Equals(entity.Id));
-        
-        if (!queryResult)
-            throw new DataSecurityAccessException($"Trying to modify entity with ID {entity.Id}, while User ID is the owner.");
-        
-        // Operate With The Entity In Database.
+
+        if (!queryResult) return null;
+
+            // Operate With The Entity In Database.
         return operation();
         
     }

@@ -2,9 +2,12 @@ using AutoMapper;
 using Api.DTO.v1.DTO;
 using App.Contracts.BLL;
 using Api.DTO.v1.Mappers;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+
+
+// ReSharper disable RouteTemplates.ActionRoutePrefixCanBeExtractedToControllerRoute
 
 
 namespace WebApp.ApiControllers;
@@ -88,13 +91,14 @@ public class EventController : ControllerBase
     /// <returns>
     /// Status Codes:<br/>
     /// 204 No Content: Update Action Was Successful.<br/>
+    /// 401 No Content: Update Action Was Successful.<br/>
     /// 400 Bad Request: ID In URL And ID in DTO Doesn't Match.<br/>
     /// </returns>
     [HttpPut("{id:guid}")]
     [Consumes("application/json")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> PutEvent(Guid id, Event appEvent)
     {
         if (!id.Equals(appEvent.Id)) return BadRequest();
@@ -118,12 +122,11 @@ public class EventController : ControllerBase
     [HttpPost]
     [Produces("application/json")]
     [Consumes("application/json")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(Event), StatusCodes.Status200OK)]
     public async Task<ActionResult<Event>> PostEvent(Event appEvent)
     {
-        if (HttpContext.GetRequestedApiVersion() == null) return BadRequest("API version is not defined.");
-        
         // Add Drink To The Database Layer.
         var bllEvent = _bll.Events.Add(_mapper.Map(appEvent)!);
         await _bll.SaveChangesAsync();
