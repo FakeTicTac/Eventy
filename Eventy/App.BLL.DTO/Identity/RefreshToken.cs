@@ -1,43 +1,31 @@
 ﻿using Base.Domain;
-using System.ComponentModel.DataAnnotations;
 
 
+// ReSharper disable CollectionNeverUpdated.Global
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 
 namespace App.BLL.DTO.Identity;
 
 
 /// <summary>
-/// Application Refresh Token Implementation. Defines Specific Entity Rows for Identity Refresh Token. 
+/// Application Business Logic Layer Refresh Token Data Transfer Object.
+///  - Data That Should Define Refresh Token.
 /// </summary>
 // ReSharper disable once ClassNeverInstantiated.Global
 public class RefreshToken : DomainEntityId
 {
     
     /// <summary>
-    /// Defines Token Signature Entity Row. 
+    /// Token Signature. 
     /// </summary>
-    [MinLength(36)] 
-    [MaxLength(36)]
-    public string? Signature { get; set; }
+    public string? Value { get; set; }
     
     /// <summary>
-    /// Defines Token Signature Expiration Date and Time Entity Row. 
+    /// Signature Expiration Date and Time. 
     /// </summary>
     public DateTime ExpirationDateTime { get; set; }
-
-    /// <summary>
-    /// Defines Previous Token Signature Entity Row. 
-    /// </summary>
-    [MinLength(36)] 
-    [MaxLength(36)]
-    public string? PreviousSignature { get; set; }
-    
-    /// <summary>
-    /// Defines Previous Token Signature Expiration Date and Time Entity Row. 
-    /// </summary>
-    public DateTime? PreviousExpirationDateTime { get; set; }
     
     
     // EF CORE Related Relations Are Going Next -->

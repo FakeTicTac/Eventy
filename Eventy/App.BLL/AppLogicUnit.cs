@@ -3,7 +3,9 @@ using AutoMapper;
 using App.BLL.Services;
 using App.Contracts.DAL;
 using App.Contracts.BLL;
+using App.BLL.Services.Identity;
 using App.Contracts.BLL.Services;
+using App.Contracts.BLL.Services.Identity;
 
 
 namespace App.BLL;
@@ -24,6 +26,16 @@ public class AppBusinessLogic :
     public IEventService Events =>
         GetService<IEventService>(() => new EventService(Uow, Uow.Events, Mapper));
 
+    
+    // Identity Related Only
+    
+    
+    /// <summary>
+    /// Business Logic Layer Service Implementation For Storing and Processing Refresh Tokens.
+    /// </summary>
+    public IRefreshTokenService RefreshTokens =>
+        GetService<IRefreshTokenService>(() => new RefreshTokenService(Uow, Uow.RefreshTokens, Mapper));
+    
     
     /// <summary>
     /// Defines Connection to The Mapper Profile.
