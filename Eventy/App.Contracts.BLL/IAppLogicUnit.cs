@@ -1,5 +1,6 @@
 ﻿using Base.Contracts.BLL;
 using App.Contracts.BLL.Services;
+using App.Contracts.BLL.Services.Identity;
 
 
 namespace App.Contracts.BLL;
@@ -16,5 +17,14 @@ public interface IAppBusinessLogic : ILogicUnit
     /// Business Logic Layer Service Definition For Storing and Manipulating Events.
     /// </summary>
     IEventService Events { get; }
+    
+    
+    // Identity Related Only
+    
+    
+    /// <summary>
+    /// Business Logic Layer Service Definition For Storing Refresh Tokens.
+    /// </summary>
+    IRefreshTokenService RefreshTokens { get; }
     
 }
