@@ -1,6 +1,11 @@
 ﻿using Base.Domain.Identity;
 
 
+// ReSharper disable CollectionNeverUpdated.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+
+
 namespace App.Domain.Identity;
 
 
