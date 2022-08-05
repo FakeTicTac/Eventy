@@ -1,5 +1,5 @@
-﻿using AutoMapper;
-
+﻿using Api.DTO.v1.DTO.Identity;
+using AutoMapper;
 using BllAppDto = App.BLL.DTO;
 using ApiDtoV1 = Api.DTO.v1.DTO;
 
@@ -22,6 +22,12 @@ public class AutoMapperProfile : Profile
     {
 
         CreateMap<ApiDtoV1.Event, BllAppDto.Event>().ReverseMap();
+        
+        
+        // Identity Related Mappings
+        
+        
+        CreateMap<RefreshToken, BllAppDto.Identity.RefreshToken>().ReverseMap();
         
     }
 }
