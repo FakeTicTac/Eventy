@@ -3,6 +3,8 @@ using Base.DAL.EF;
 using App.Contracts.DAL;
 using App.DAL.EF.Repositories;
 using App.Contracts.DAL.Repositories;
+using App.DAL.EF.Repositories.Identity;
+using App.Contracts.DAL.Repositories.Identity;
 
 
 namespace App.DAL.EF;
@@ -20,8 +22,18 @@ public class AppUnitOfWork : BaseUnitOfWork<AppDbContext>, IAppUnitOfWork
     /// </summary>
     public IEventRepository Events =>
             GetRepository(() => new EventRepository(UowDbContext, Mapper));
+
+    
+    // Identity Related Only.
     
     
+    /// <summary>
+    /// Data Access Layer Refresh Token Repository Implementation.
+    /// </summary>
+    public IRefreshTokenRepository RefreshTokens =>
+        GetRepository(() => new RefreshTokenRepository(UowDbContext, Mapper));
+    
+
     /// <summary>
     /// Defines Connection to The Mapper Profile.
     /// </summary>

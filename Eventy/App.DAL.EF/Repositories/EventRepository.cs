@@ -15,7 +15,8 @@ namespace App.DAL.EF.Repositories;
 /// <summary>
 /// Event Data Access Layer Repository Implementation.
 /// </summary>
-public class EventRepository : BaseEntityRepository<DalAppDTO.Event, DomainApp.Event, AppUser, AppDbContext>, 
+public class EventRepository : 
+    BaseEntityRepository<DalAppDTO.Event, DomainApp.Event, AppUser, AppDbContext>, 
     IEventRepository
 {
     

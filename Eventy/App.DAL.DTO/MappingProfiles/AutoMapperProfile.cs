@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using App.DAL.DTO.Identity;
 
 using DomainApp = App.Domain;
 
@@ -22,5 +23,11 @@ public class AutoMapperProfile : Profile
         
         CreateMap<Event, DomainApp.Event>().ReverseMap();
 
+        
+        // Identity Related Mappings
+        
+        
+        CreateMap<RefreshToken, DomainApp.Identity.RefreshToken>().ReverseMap();
+        
     }
 }
