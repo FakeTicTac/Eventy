@@ -88,9 +88,9 @@ public static class AppDataHelper
         // Initialize Users Data For User Creation.
         var users = new (string userName, string password, string roles)[]
         {
-            ("romake@ttu.ee", "FakeTicTac1", "Admin,User"),
-            ("semovs@ttu.ee", "FakeTicTac1", "User"),
-            ("darbel@ttu.ee", "FakeTicTac1", "User")
+            ("romake@ttu.ee", "123456QWE", "Admin,User"),
+            ("semovs@ttu.ee", "123456QWE", "User"),
+            ("darbel@ttu.ee", "123456QWE", "User")
         };
         
         // Create Users From Given Data and Seed Them Into Database.

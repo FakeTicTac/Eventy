@@ -91,22 +91,24 @@ public class EventController : ControllerBase
     /// <returns>
     /// Status Codes:<br/>
     /// 204 No Content: Update Action Was Successful.<br/>
-    /// 401 No Content: Update Action Was Successful.<br/>
     /// 400 Bad Request: ID In URL And ID in DTO Doesn't Match.<br/>
     /// </returns>
     [HttpPut("{id:guid}")]
     [Consumes("application/json")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> PutEvent(Guid id, Event appEvent)
     {
         if (!id.Equals(appEvent.Id)) return BadRequest();
         
-        // Update State In Database.
-        _bll.Events.Update(_mapper.Map(appEvent)!);
-        
-        // TODO! Security!
+        // Try To Update State In Database.
+        var bllResponse = _bll.Events.Update(_mapper.Map(appEvent)!);
+
+        // Check If Operation Process Was Successful.
+        if (bllResponse == null) return BadRequest();
         
         await _bll.SaveChangesAsync();
 
@@ -123,7 +125,7 @@ public class EventController : ControllerBase
     [Produces("application/json")]
     [Consumes("application/json")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(Event), StatusCodes.Status200OK)]
     public async Task<ActionResult<Event>> PostEvent(Event appEvent)
     {
@@ -150,7 +152,8 @@ public class EventController : ControllerBase
     [HttpDelete("{id:guid}")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteEvent(Guid id)
     {
@@ -158,9 +161,11 @@ public class EventController : ControllerBase
         var appEvent = await _bll.Events.FirstOrDefaultAsync(id);
         if (appEvent == null) return NotFound();
         
-        // TODO! Security!
-        // Remove Existed Record.
-        _bll.Events.Remove(appEvent);
+        // Try To Remove Existed Record.
+        var bllResponse = _bll.Events.Remove(appEvent);
+
+        if (bllResponse == null) return BadRequest();
+        
         await _bll.SaveChangesAsync();
 
         return NoContent();
