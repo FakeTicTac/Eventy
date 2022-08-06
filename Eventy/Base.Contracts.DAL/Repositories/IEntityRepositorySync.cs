@@ -33,7 +33,7 @@ public interface IEntityRepositorySync<TDalEntity, in TKey>
     /// <param name="entity">Defines Entity To Be Updated in The Database.</param>
     /// <param name="userId">Defines Entity Demanding User Foreign Key Value.</param>
     /// <returns>The Value of Updated Entity.</returns>
-    TDalEntity Update(
+    TDalEntity? Update(
         TDalEntity entity, 
         object? userId = null
         );
@@ -45,7 +45,7 @@ public interface IEntityRepositorySync<TDalEntity, in TKey>
     /// <param name="id">Defines Entity Primary Be Removed From The Database.</param>
     /// <param name="userId">Defines Entity Demanding User Foreign Key Value.</param>
     /// <returns>The Value of Removed Entity.</returns>
-    TDalEntity Remove(
+    TDalEntity? Remove(
         TKey id, 
         object? userId = null
         );
@@ -57,7 +57,7 @@ public interface IEntityRepositorySync<TDalEntity, in TKey>
     /// <param name="entity">Defines Entity To Be Removed From The Database.</param>
     /// <param name="userId">Defines Entity Demanding User Foreign Key Value.</param>
     /// <returns>The Value of Removed Entity.</returns>
-    TDalEntity Remove(
+    TDalEntity? Remove(
         TDalEntity entity, 
         object? userId = null
         );

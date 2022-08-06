@@ -107,10 +107,10 @@ public class BaseEntityService<TBllEntity, TDalEntity, TKey, TUnitOfWork, TRepos
     /// <param name="entity">Entity Value To Be Process.</param>
     /// <param name="userId">Defines Entity Demanding User ID Value.</param>
     /// <returns>The Value of Updated Entity.</returns>
-    public virtual TBllEntity Update(
+    public virtual TBllEntity? Update(
         TBllEntity entity, 
         object? userId = null
-        ) => Mapper.Map(ServiceRepository.Update(Mapper.Map(entity)!, userId))!;
+        ) => Mapper.Map(ServiceRepository.Update(Mapper.Map(entity)!, userId));
     
     
     /// <summary>
@@ -119,10 +119,10 @@ public class BaseEntityService<TBllEntity, TDalEntity, TKey, TUnitOfWork, TRepos
     /// <param name="entity">Entity Value To Be Process.</param>
     /// <param name="userId">Defines Entity Demanding User ID Value.</param>
     /// <returns>The Value of Removed Entity.</returns>
-    public virtual TBllEntity Remove(
+    public virtual TBllEntity? Remove(
         TBllEntity entity, 
         object? userId = null
-        ) => Mapper.Map(ServiceRepository.Remove(Mapper.Map(entity)!, userId))!;
+        ) => Mapper.Map(ServiceRepository.Remove(Mapper.Map(entity)!, userId));
 
     
     /// <summary>
@@ -132,10 +132,10 @@ public class BaseEntityService<TBllEntity, TDalEntity, TKey, TUnitOfWork, TRepos
     /// <param name="userId">Defines Entity Demanding User ID Value.</param>
     /// <returns>The Value of Removed Entity.</returns>
     /// <exception cref="NullReferenceException">Thrown if Entity Doesn't Exist in Database.</exception>
-    public virtual TBllEntity Remove(
+    public virtual TBllEntity? Remove(
         TKey id, 
         object? userId = null
-        ) => Mapper.Map(ServiceRepository.Remove(id, userId))!;
+        ) => Mapper.Map(ServiceRepository.Remove(id, userId));
 
     
     /// <summary>
@@ -189,7 +189,7 @@ public class BaseEntityService<TBllEntity, TDalEntity, TKey, TUnitOfWork, TRepos
     /// <param name="userId">Defines Entity Demanding User ID Value.</param>
     /// <returns>Asynchronous Operation That Returns The Value of Removed Entity.</returns>
     /// <exception cref="NullReferenceException">Thrown if Entity Doesn't Exist in Database.</exception>
-    public virtual async Task<TBllEntity> RemoveAsync(
+    public virtual async Task<TBllEntity?> RemoveAsync(
         TKey id, 
         object? userId = null
         ) => Mapper.Map(await ServiceRepository.RemoveAsync(id, userId))!;

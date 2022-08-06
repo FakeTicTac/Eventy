@@ -35,13 +35,13 @@ public class BaseMapper<TLeftObject, TRightObject> : IBaseMapper<TLeftObject, TR
     /// </summary>
     /// <param name="inObject">Defines Object To Be Mapped.</param>
     /// <returns>First (Left) Object Mapped To Second (Right) Object.</returns>
-    public virtual TRightObject? Map(TLeftObject? inObject) => Mapper.Map<TRightObject>(inObject);
+    public virtual TRightObject? Map(TLeftObject? inObject) => inObject == null ? Mapper.Map<TRightObject>(inObject) : null;
 
     /// <summary>
     /// Method Maps the Second (Right) Object to the First (Left) Object.
     /// </summary>
     /// <param name="inObject">Defines Object To Be Mapped.</param>
     /// <returns>Second (Right) Object Mapped To First (Left) Object.</returns>
-    public virtual TLeftObject? Map(TRightObject? inObject) => Mapper.Map<TLeftObject>(inObject);
+    public virtual TLeftObject? Map(TRightObject? inObject) => inObject == null ? Mapper.Map<TLeftObject>(inObject) : null;
     
 }

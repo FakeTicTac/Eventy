@@ -22,7 +22,7 @@ public interface IEntityRepositoryAsync<TDalEntity, TKey>
     /// <param name="id">Defines Entity Primary Key To Be Removed From The Database.</param>
     /// <param name="userId">Defines Entity Demanding User Foreign Key Value.</param>
     /// <returns>Asynchronous Operation That Returns The Value of Removed Entity.</returns>
-    Task<TDalEntity> RemoveAsync(
+    Task<TDalEntity?> RemoveAsync(
         TKey id, 
         object? userId = null
         );

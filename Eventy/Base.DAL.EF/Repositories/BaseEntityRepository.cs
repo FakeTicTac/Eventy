@@ -104,25 +104,23 @@ public class BaseEntityRepository<TDalEntity, TDomainEntity, TUser, TKey, TDbCon
     /// <param name="userId">Defines Entity Demanding User ID Value.</param>
     /// <returns>The Value of Added Entity.</returns>
     public virtual TDalEntity Add(
-        TDalEntity entity, 
+        TDalEntity entity,
         object? userId = null
-        ) => Mapper.Map(
-        SecurityBasicHandler(Mapper.Map(entity)!,
-            () => RepoDbSet.Add(Mapper.Map(entity)!).Entity, userId))!;
+    ) => Mapper.Map(RepoDbSet.Add(Mapper.Map(entity)!).Entity)!;
 
-    
+
     /// <summary>
     /// Method Updates Given Entity in the Database. (Secured at Database Layer)
     /// </summary>
     /// <param name="entity">Entity Value To Be Process.</param>
     /// <param name="userId">Defines Entity Demanding User ID Value.</param>
     /// <returns>The Value of Updated Entity.</returns>
-    public virtual TDalEntity Update(
+    public virtual TDalEntity? Update(
         TDalEntity entity, 
         object? userId = null
         ) => Mapper.Map(
         SecurityBasicHandler(Mapper.Map(entity)!, 
-            () => JsonbUpdate(RepoDbSet.Update(Mapper.Map(entity)!).Entity), userId))!;
+            () => JsonbUpdate(RepoDbSet.Update(Mapper.Map(entity)!).Entity), userId));
     
     
     /// <summary>
@@ -131,12 +129,12 @@ public class BaseEntityRepository<TDalEntity, TDomainEntity, TUser, TKey, TDbCon
     /// <param name="entity">Entity Value To Be Process.</param>
     /// <param name="userId">Defines Entity Demanding User ID Value.</param>
     /// <returns>The Value of Removed Entity.</returns>
-    public virtual TDalEntity Remove(
+    public virtual TDalEntity? Remove(
         TDalEntity entity, 
         object? userId = null
         ) => Mapper.Map(
         SecurityBasicHandler(Mapper.Map(entity)!,
-            () => RepoDbSet.Remove(Mapper.Map(entity)!).Entity, userId))!;
+            () => RepoDbSet.Remove(Mapper.Map(entity)!).Entity, userId));
     
     
     /// <summary>
@@ -145,8 +143,7 @@ public class BaseEntityRepository<TDalEntity, TDomainEntity, TUser, TKey, TDbCon
     /// <param name="id">Defines Entity ID To Be Removed From The Database.</param>
     /// <param name="userId">Defines Entity Demanding User ID Value.</param>
     /// <returns>The Value of Removed Entity.</returns>
-    /// <exception cref="NullReferenceException">Thrown if Entity Doesn't Exist in Database.</exception>
-    public virtual TDalEntity Remove(
+    public virtual TDalEntity? Remove(
         TKey id, 
         object? userId = null
         )
@@ -154,10 +151,9 @@ public class BaseEntityRepository<TDalEntity, TDomainEntity, TUser, TKey, TDbCon
         
         // Try To Get Entity From Database Layer.
         var entity = FirstOrDefault(id);
-        
-        if (entity == null) 
-            throw new DataExistenceException($"Entity with given ID {id} doesn't exist in database layer.");
-        
+
+        if (entity == null) return null;
+
         return Mapper.Map(SecurityBasicHandler(
             Mapper.Map(entity)!, 
             () => RepoDbSet.Remove(Mapper.Map(entity)!).Entity, userId))!;
@@ -216,7 +212,7 @@ public class BaseEntityRepository<TDalEntity, TDomainEntity, TUser, TKey, TDbCon
     /// <param name="userId">Defines Entity Demanding User ID Value.</param>
     /// <returns>Asynchronous Operation That Returns The Value of Removed Entity.</returns>
     /// <exception cref="NullReferenceException">Thrown if Entity Doesn't Exist in Database.</exception>
-    public virtual async Task<TDalEntity> RemoveAsync(
+    public virtual async Task<TDalEntity?> RemoveAsync(
         TKey id, 
         object? userId = null
         ) 
@@ -224,12 +220,8 @@ public class BaseEntityRepository<TDalEntity, TDomainEntity, TUser, TKey, TDbCon
         
         // Try To Get Entity From Database Layer.
         var entity = await FirstOrDefaultAsync(id);
-        
-        if (entity == null) 
-            throw new DataExistenceException($"Entity with given ID {id} doesn't exist in database layer.");
 
-        return Remove(entity, userId);
-
+        return entity == null ? null : Remove(entity, userId);
     }
 
     /// <summary>
@@ -309,7 +301,7 @@ public class BaseEntityRepository<TDalEntity, TDomainEntity, TUser, TKey, TDbCon
     /// <param name="entity">Defines Entity To Be Processed.</param>
     /// <param name="operation">Operation Declaration To Be Performed on Database Layer.</param>
     /// <param name="userId">Defines Entity Demanding User ID Value.</param>
-    /// <returns></returns>
+    /// <returns>Processed Entity Object Or Null In Case Of Trying To Modify Wrong Data.</returns>
     protected virtual TDomainEntity? SecurityBasicHandler(
         TDomainEntity entity, 
         Func<TDomainEntity> operation, 
@@ -329,11 +321,7 @@ public class BaseEntityRepository<TDalEntity, TDomainEntity, TUser, TKey, TDbCon
             .Any(x => Microsoft.EntityFrameworkCore.EF.Property<TKey>(x, nameof(IDomainEntityUser<TUser>.AppUserId))
                 .Equals((TKey) userId) && x.Id.Equals(entity.Id));
 
-        if (!queryResult) return null;
-
-            // Operate With The Entity In Database.
-        return operation();
-        
+        return !queryResult ? null : operation();
     }
     
     
