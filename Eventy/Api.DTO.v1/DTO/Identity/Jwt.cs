@@ -18,11 +18,16 @@ public class Jwt
     /// <summary>
     /// JWT Token Value Produced And Encrypted By Backend.
     /// </summary>
-    public string? TokenValue { get; set; }
+    public string? AccessTokenValue { get; set; }
     
     /// <summary>
     /// Part of Users' Account Data and Especially Username. 
     /// </summary>
     public string? Username { get; set; }
+    
+    /// <summary>
+    /// Users Refresh Token For Access Token Request.
+    /// </summary>
+    public string? RefreshTokenValue { get; set; }
     
 }

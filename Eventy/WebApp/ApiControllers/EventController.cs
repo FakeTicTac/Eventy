@@ -1,5 +1,6 @@
 using AutoMapper;
 using Api.DTO.v1.DTO;
+using Base.Extensions;
 using App.Contracts.BLL;
 using Api.DTO.v1.Mappers;
 using Microsoft.AspNetCore.Mvc;
@@ -60,7 +61,18 @@ public class EventController : ControllerBase
     [Produces("application/json")]
     [ProducesResponseType(typeof(IEnumerable<Event>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<Event>>> GetEvents() => 
-        Ok((await _bll.Events.GetAllAsync()).Select(x => _mapper.Map(x)));
+        Ok((await _bll.Events.GetAllAsync(User.GetUserId())).Select(x => _mapper.Map(x)));
+    
+    
+    /// <summary>
+    /// Method Gets All Possible Events By Given Part of Its' Name Located In Database.
+    /// </summary>
+    /// <returns>IEnumerable of All Possible Events Located In Database.</returns>
+    [HttpGet("{partialName}")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(IEnumerable<Event>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IEnumerable<Event>>> GetEvents(string partialName) => 
+        Ok((await _bll.Events.GetAllByPartialNameAsync(partialName)).Select(x => _mapper.Map(x)));
     
     
     /// <summary>
@@ -74,7 +86,7 @@ public class EventController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<Event>> GetEvent(Guid id)
     {
-        var appEvent = await _bll.Events.FirstOrDefaultAsync(id);
+        var appEvent = await _bll.Events.FirstOrDefaultAsync(id, User.GetUserId());
 
         // Check If Exist In Database.
         if (appEvent == null) return NotFound();
@@ -105,7 +117,7 @@ public class EventController : ControllerBase
         if (!id.Equals(appEvent.Id)) return BadRequest();
         
         // Try To Update State In Database.
-        var bllResponse = _bll.Events.Update(_mapper.Map(appEvent)!);
+        var bllResponse = _bll.Events.Update(_mapper.Map(appEvent)!, User.GetUserId());
 
         // Check If Operation Process Was Successful.
         if (bllResponse == null) return BadRequest();
@@ -130,7 +142,7 @@ public class EventController : ControllerBase
     public async Task<ActionResult<Event>> PostEvent(Event appEvent)
     {
         // Add Drink To The Database Layer.
-        var bllEvent = _bll.Events.Add(_mapper.Map(appEvent)!);
+        var bllEvent = _bll.Events.Add(_mapper.Map(appEvent)!, User.GetUserId());
         await _bll.SaveChangesAsync();
 
         return CreatedAtAction("GetEvent", new
@@ -158,7 +170,7 @@ public class EventController : ControllerBase
     public async Task<IActionResult> DeleteEvent(Guid id)
     {
         // Try To Get Record From Database.
-        var appEvent = await _bll.Events.FirstOrDefaultAsync(id);
+        var appEvent = await _bll.Events.FirstOrDefaultAsync(id, User.GetUserId());
         if (appEvent == null) return NotFound();
         
         // Try To Remove Existed Record.

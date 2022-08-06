@@ -1,10 +1,13 @@
 ﻿using System.Net;
 using Base.Extensions;
+using App.Contracts.BLL;
 using System.Diagnostics;
 using Api.DTO.v1.DTO.Errors;
+using System.Security.Claims;
 using Api.DTO.v1.DTO.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
+using System.IdentityModel.Tokens.Jwt;
 
 using AppUser = App.Domain.Identity.AppUser;
 
@@ -46,6 +49,11 @@ public class AccountController : ControllerBase
     /// </summary>
     private readonly Random _rnd = new();
 
+    /// <summary>
+    /// Business Logic Layer Connection Definition.
+    /// </summary>
+    private readonly IAppBusinessLogic _bll;
+    
 
     /// <summary>
     /// Basic Account Controller Constructor.
@@ -54,17 +62,20 @@ public class AccountController : ControllerBase
     /// <param name="userManager">Defines Connection API For User Managing Operations.</param>
     /// <param name="logger">Defines Logging Connection.</param>
     /// <param name="configuration">Defines Connection To Application Configurations.</param>
+    /// <param name="bll">Defines Business Logic Layer</param>
     public AccountController(
         SignInManager<AppUser> signInManager, 
         UserManager<AppUser> userManager, 
         ILogger<AccountController> logger, 
-        IConfiguration configuration
+        IConfiguration configuration,
+        IAppBusinessLogic bll
         )
     {
         _signInManager = signInManager;
         _userManager = userManager;
         _logger = logger;
         _configuration = configuration;
+        _bll = bll;
     }
     
     
@@ -117,7 +128,20 @@ public class AccountController : ControllerBase
             await Task.Delay(_rnd.Next(100, 1000));
             return NotFound("Problem with Login credentials.");
         }
+
+        // Handle Old Tokens.
+        OldRefreshTokenHandler(user);
         
+        // Create New Tokens And Save It Into System.
+        var refreshToken = new App.BLL.DTO.Identity.RefreshToken
+        {
+            AppUserId = user.Id,
+            Value = Guid.NewGuid().ToString(),
+            ExpirationDateTime = DateTime.UtcNow.AddDays(7)
+        };
+
+        _bll.RefreshTokens.Add(refreshToken);
+        await _bll.SaveChangesAsync();
         
         // Generate JWT Token For User.
         var jwt = IdentityExtensions.GenerateJwt(
@@ -131,7 +155,8 @@ public class AccountController : ControllerBase
         // Send JWT Token Data Transfer Object From Backend.
         return Ok(new Jwt
         {
-            TokenValue = jwt,
+            AccessTokenValue = jwt,
+            RefreshTokenValue = refreshToken.Value,
             Username = user.UserName
         });
     }
@@ -231,6 +256,16 @@ public class AccountController : ControllerBase
             return NotFound("Problem with Login credentials.");
         }
 
+        // Create New Tokens And Save It Into System.
+        var refreshToken = new App.BLL.DTO.Identity.RefreshToken
+        {
+            AppUserId = user.Id,
+            Value = Guid.NewGuid().ToString(),
+            ExpirationDateTime = DateTime.UtcNow.AddDays(7)
+        };
+
+        _bll.RefreshTokens.Add(refreshToken);
+        await _bll.SaveChangesAsync();
         
         // Generate JWT Token For User.
         var jwt = IdentityExtensions.GenerateJwt(
@@ -244,8 +279,127 @@ public class AccountController : ControllerBase
         // Send JWT Token Data Transfer Object From Backend.
         return Ok(new Jwt
         {
-            TokenValue = jwt,
+            AccessTokenValue = jwt,
+            RefreshTokenValue = refreshToken.Value,
             Username = user.UserName
         });
+    }
+    
+    
+    /// <summary>
+    /// Method Process User Token Refreshment System.
+    ///  - Generates JWT And Send It Back To User.
+    ///  - Authorize Type: Bearer
+    /// </summary>
+    /// <param name="tokenRefreshment">Supply Access And Refresh Tokens.</param>
+    /// <returns>Generated Access And Refresh Tokens.</returns>
+    [HttpPost]
+    [Produces("application/json")]
+    [Consumes("application/json")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<Jwt>> RefreshToken([FromBody] TokenRefreshment tokenRefreshment)
+    {
+        
+        // Try To Get User Info From JWT Access Token.
+        JwtSecurityToken accessToken;
+        
+        try
+        {
+            accessToken = new JwtSecurityTokenHandler().ReadJwtToken(tokenRefreshment.AccessToken);
+        }
+        catch (Exception)
+        {
+            return BadRequest("Can't parse token.");
+        }
+        
+        // Validate Token Signature.
+        var userEmail = accessToken
+            .Claims
+            .FirstOrDefault(x => x.Type == ClaimTypes.Email)?
+            .Value;
+
+        if (userEmail == null) return BadRequest("No email in jwt token.");
+        
+        // Get User And Tokens
+
+        var user = await _userManager.FindByEmailAsync(userEmail);
+
+        if (user == null) return NotFound($"User with email {userEmail} not found");
+
+        var oldRefreshTokens = (await _bll.RefreshTokens.GetAllAsync(user.Id))
+            .Where(x => x.Value!.Equals(tokenRefreshment.RefreshToken) && x.ExpirationDateTime > DateTime.UtcNow)
+            .ToList();
+        
+        if (oldRefreshTokens.Equals(null)) return Problem("RefreshTokens collection is null");
+
+        if (oldRefreshTokens.Count == 0) 
+            return Problem("RefreshTokens collection is empty, no valid refresh tokens found");
+
+        if (oldRefreshTokens.Count > 1) return Problem("More than one valid refresh token found.");
+        
+        // New JWT
+        // Get Claims based user
+        var claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(user);
+
+        if (claimsPrincipal == null)
+        {
+            _logger.LogWarning("WebApi, Cannot Get Claims Principal for User {}", userEmail);
+            await Task.Delay(_rnd.Next(100, 1000));
+            return NotFound("User/Password problem");
+        }
+
+        // Remove Old Token.
+        _bll.RefreshTokens.Remove(oldRefreshTokens[0].Id);
+
+        // Create New Tokens And Save It Into System.
+        var newRefreshToken = new App.BLL.DTO.Identity.RefreshToken
+        {
+            AppUserId = user.Id,
+            Value = Guid.NewGuid().ToString(),
+            ExpirationDateTime = DateTime.UtcNow.AddDays(7)
+        };
+
+        _bll.RefreshTokens.Add(newRefreshToken);
+        await _bll.SaveChangesAsync();
+        
+        
+        // Generate JWT
+        var jwt = IdentityExtensions.GenerateJwt(
+            claimsPrincipal.Claims,
+            _configuration["JWT:Key"],
+            _configuration["JWT:issuer"],
+            _configuration["JWT:issuer"],
+            DateTime.Now.AddMinutes(_configuration.GetValue<int>("JWT:ExpireInMinutes")));
+
+        
+        // Send JWT Token Data Transfer Object From Backend.
+        return Ok(new Jwt
+        {
+            AccessTokenValue = jwt,
+            RefreshTokenValue = newRefreshToken.Value,
+            Username = user.UserName
+        });
+    }
+    
+    
+    // Helping Methods.
+
+
+    /// <summary>
+    /// Method Deletes All Refresh Tokens That Expire.
+    /// </summary>
+    /// <param name="user">Defines User To Remove Old Refresh Tokens.</param>
+    public async void OldRefreshTokenHandler(AppUser user)
+    {
+        // Get All Tokens Related To User.
+        var refreshTokens = (await _bll.RefreshTokens.GetAllAsync(user.Id))
+            .Where(x => x.AppUserId.Equals(user.Id));
+
+        foreach (var refreshToken in refreshTokens)
+        {
+            if (refreshToken.ExpirationDateTime < DateTime.UtcNow) _bll.RefreshTokens.Remove(refreshToken);
+        }
     }
 }
